@@ -11,6 +11,7 @@ inverse_warp=$(jq -r '."inverse-warp"' config.json)
 affine=$(jq -r .affine config.json)
 input_t1w=$(jq -r .input_t1 config.json)
 input_tractmasks=$(jq -r .input_tractmasks config.json)
+input_masks=$(jq -r .input_mask config.json)
 interpolation=$(jq -r .interpolation config.json)
 inverse=$(jq -r .inverse config.json)
 affine_only=$(jq -r .affine_only config.json)
@@ -54,7 +55,10 @@ if [ -n "$input_tractmasks" ] && [ "$input_tractmasks" != "null" ] && [ -d "$inp
         echo "Applying transform to tract mask: $mask_file"
         bash ./apply_transform.sh "$mask_file" "$anat" "$warp" "$inverse_warp" "$affine" "$interpolation" "$inverse" "$affine_only" "$fsl_transform"
     done
-
+elif [ -n "$input_mask" ] && [ "$input_mask" != "null" ] && [ -f "$input_mask" ]; then
+    echo "Detected brain masks: $input_mask"
+    echo "Applying transform to tract mask: $input_mask"
+    bash ./apply_transform.sh "$input_mask" "$anat" "$warp" "$inverse_warp" "$affine" "$interpolation" "$inverse" "$affine_only" "$fsl_transform"
 else
     # === Fallback: use input_t1w as input ===
     if [ -n "$input_t1w" ] && [ "$input_t1w" != "null" ]; then
